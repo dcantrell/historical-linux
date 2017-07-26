@@ -14,9 +14,9 @@ particular system.
 The list below contains the current in-progress or available distributions in
 this project:
 
-Subdirectory | Name | Architecture | Description
--------------|------|--------------|------------
-RHL-5.1/ | Red Hat Linux 5.1 | i386 | Released on May 22, 1998, this release was codenamed "Manhattan" and came with the 2.0.34 kernel.  The system used glibc, as that was new for the 5.x series.  New in this release were linuxconf, Netscape, and a preview of the GNOME desktop environment (available for separate installation, not part of the actual distribution).
+| Subdirectory | Name | Architecture | Release Date |
+|:---|:---|:---|:---|
+| RHL-5.1/ | Red Hat Linux 5.1 | i386 | May 22, 1998 |
 
 The subdirectories above contain my notes and scripts that helped me prepare
 the virtual guest disk image.  If you are just interested in running the guest,
@@ -32,6 +32,6 @@ still publicly available.  Sites carrying historical Linux distributions:
 
 Thanks and enjoy seeing Linux from many many years ago.
 
--- 
 David Cantrell
-<david.l.cantrell@gmail.com>
+
+[david.l.cantrell@gmail.com] and [dcantrell@redhat.com]
