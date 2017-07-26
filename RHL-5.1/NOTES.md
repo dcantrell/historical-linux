@@ -5,7 +5,7 @@
 ## Required Downloads ##
 
 Download the RHL 5.1 release from
-[ftp://ftp.ibiblio.org/pub/historic-linux/distributions/redhat-5.1/i386/].
+ftp://ftp.ibiblio.org/pub/historic-linux/distributions/redhat-5.1/i386/.
 Specific requirements:
 
 | File or Directory | Description |
@@ -31,13 +31,91 @@ packages.
 The first image will be the actual disk image.  1G is enough for this
 distribution:
 
-`qemu-img create hda.img 1G`
+> `qemu-img create hda.img 1G`
 
 The second image will be the installation source.  We only need 400M:
 
-`qemu-img create hdb.img 400M`
+> `qemu-img create hdb.img 400M`
 
 ## Formatting The Installation Source Image ##
+
+We need to copy the RedHat/ subdirectory on to the hdb.img disk, but in a
+partition and on a compatible filesystem.  You cannot easily create a
+compatible ext2 filesystem on a modern Linux system because incompatible
+features have been added to ext2 in later kernels.  It's easiest to make the
+filesystem under Red Hat Linux 5.1.  We can do this with the rescue media.
+
+Boot qemu:
+
+> `qemu-system-i386 -m 64 -hda hdb.img -fda boot.img -boot a -monitor stdio`
+
+The *-hda hdb.img* is not a typo.  We only need to work on the **hdb.img**
+image file at this time, so we can just pass it as the first hard disk.
+
+At the boot prompt, type `rescue` and press Enter.  The kernel will boot and
+eventually you will see a message to remove the boot floppy and insert the
+rescue floppy.  Go to the qemu monitor window and type:
+
+> `(qemu) change floppy0 rescue.img`
+
+Then go back to the window with the message and press Enter.  This will load
+the rescue system and dump you at a root shell.
+
+From the root shell, launch fdisk and create 1 partition consuming the entire
+disk and then format it as ext2:
+
+> `bash# fdisk /dev/hda
+
+   Command (m for help): n
+   Command action
+      e   extended
+      p   primary partition (1-4)
+   p
+   Partition number (1-4): 1
+   First cylinder (1-812): 1
+   Last cylinder or +size or +sizeM or +sizeK ([1]-812): 812
+
+   Command (m for help): w
+   The partition table has been altered!
+
+   Calling ioctl() to re-read partition table.
+    hda: hda1
+    hda: hda1
+   Syncing disks.
+
+   WARNING: If you have created or modified any DOS 6x
+   partitions, please see the fdisk manual page for additional
+   information.
+   bash# mke2fs /dev/hda1
+   ...[lots of stuff]...
+   Writing superblocks and filesystem accounting information: done
+   bash#`
+
+
+
+
+
+# Use the i386 qemu.
+QEMU="qemu-system-i386"
+
+# Memory size set to 64M because old Linux sort of stopped counting after
+# that.  Yes, I know you can pass mem=SIZE, but it doesn't matter now.
+QEMU_MEM="-m 64"
+
+# Hard disk image(s).
+QEMU_HDA="-hda hda.img -hdb hdb.img"
+
+# Install media are floppy disks for this distribution.
+QEMU_INSTALL_MEDIA="-fda boot.img -boot a"
+
+# Network device needs to be NE2000 PCI and bridged to the host.
+#QEMU_NETWORK="-netdev br0,id=net0 -device ne2k_pci,netdev=net0,id=net0"
+
+# Other options for qemu
+QEMU_OPTS="-monitor stdio"
+
+# Launch the virtual guest booting the install media
+$QEMU $QEMU_MEM $QEMU_HDA $QEMU_INSTALL_MEDIA $QEMU_NETWORK $QEMU_OPTS
 
 ## Installing ##
 
